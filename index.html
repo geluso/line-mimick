@@ -70,8 +70,37 @@
         return map;
       }
       
+      function generateXYDependentMap() {
+        // map[dx1][dy1].push({x:dx2,y:dy2})
+        var map = {};
+        
+        for (var i = 2; i < ACTUAL_COORDS.length; i++) {
+          var p0 = ACTUAL_COORDS[i - 2];
+          var p1 = ACTUAL_COORDS[i - 1];
+          var p2 = ACTUAL_COORDS[i];
+          
+          var dx1 = p1.x - p0.x;
+          var dx2 = p2.x - p1.x;
+          
+          var dy1 = p1.y - p0.y;
+          var dy2 = p2.y - p1.y;
+          
+          if (map[dx1] === undefined) {
+            map[dx1] = {};
+          }
+          if (map[dx1][dy1] === undefined) {
+            map[dx1][dy1] = [];
+          }
+          
+          map[dx1][dy1].push({x: dx2, y: dy2});
+        }
+        return map;
+      }
+      
       function generateCoords() {
-        var map = generateMap();
+        // var getMap = generateMap;
+        var getMap = generateXYDependentMap;
+        var map = getMap();
         var coords = [];
         var dx = ACTUAL_COORDS[1].x - ACTUAL_COORDS[0].x;
         var dy = ACTUAL_COORDS[1].y - ACTUAL_COORDS[0].y;
@@ -81,17 +110,30 @@
         
         while (dx != undefined && dy != undefined && coords.length < 2 * ACTUAL_COORDS.length) {
           coords.push({x: xx, y: yy});
-          var x_values = map.x[dx];
-          var y_values = map.y[dy];
-          if (x_values === undefined || y_values === undefined) {
-            break;
+          var x_values, y_values;
+          if (getMap === generateMap) {
+            x_values = map.x[dx];
+            y_values = map.y[dy];
+            if (x_values === undefined || y_values === undefined) {
+              break;
+            } else {
+              var x_val = x_values[Math.floor(Math.random() * x_values.length)];
+              var y_val = y_values[Math.floor(Math.random() * y_values.length)];
+              xx += x_val;
+              yy += y_val;
+              dx = x_val;
+              dy = y_val;
+            }
           } else {
-            var x_val = x_values[Math.floor(Math.random() * x_values.length)];
-            var y_val = y_values[Math.floor(Math.random() * y_values.length)];
-            xx += x_val;
-            yy += y_val;
-            dx = x_val;
-            dy = y_val;
+            if (map[dx] === undefined || map[dx][dy] === undefined) {
+              break;
+            }
+            values = map[dx][dy];
+            val = values[Math.floor(Math.random() * values.length)];
+            xx += val.x;
+            yy += val.y;
+            dx = val.x;
+            dy = val.y;
           }
         }
         
