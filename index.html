@@ -3,7 +3,7 @@
     <title></title>
     <link rel="icon" href="http://5tephen.com/img/cheeseplane.gif" type="image/gif"/>
   </head>
-  <body>
+  <body style="background-color: black;">
     <canvas id="canvas" style="width: 100%; height: 100%;"></canvas>
     <script>
       var BUCKET_SIZE = 1;
@@ -11,6 +11,12 @@
       var ACTUAL_COORDS = [];
       var GENERATED_COORDS = [];
       var RECORDING = false;
+      
+      var ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      ctx.width = window.innerWidth;
+      ctx.height = window.innerHeight;
       
       document.onmousedown = function(ev) {
         RECORDING = true;
@@ -30,6 +36,7 @@
       
       function drawPath(ctx, path, color="black") {
         ctx.strokeStyle = color;
+        ctx.lineWidth = 8;
         ctx.beginPath();
         ctx.moveTo(path[0].x, path[0].y);
         
@@ -97,18 +104,18 @@
         return map;
       }
       
-      function generateCoords() {
+      function generateCoords(path) {
         // var getMap = generateMap;
         var getMap = generateXYDependentMap;
         var map = getMap();
         var coords = [];
-        var dx = ACTUAL_COORDS[1].x - ACTUAL_COORDS[0].x;
-        var dy = ACTUAL_COORDS[1].y - ACTUAL_COORDS[0].y;
+        var dx = path[1].x - path[0].x;
+        var dy = path[1].y - path[0].y;
         
-        var xx = Math.floor(window.innerWidth / 2);
-        var yy = Math.floor(window.innerHeight / 2);
+        var xx = ACTUAL_COORDS[0].x;
+        var yy = ACTUAL_COORDS[0].y;
         
-        while (dx != undefined && dy != undefined && coords.length < 2 * ACTUAL_COORDS.length) {
+        while (dx != undefined && dy != undefined && coords.length < 2 * path.length) {
           coords.push({x: xx, y: yy});
           var x_values, y_values;
           if (getMap === generateMap) {
@@ -141,15 +148,21 @@
       }
       
       document.onmouseup = function() {
-        var ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.width = window.innerWidth;
-        ctx.height = window.innerHeight;
-        
-        drawPath(ctx, ACTUAL_COORDS, "black");
-        var generatedCoords = generateCoords();
+        var generatedCoords = generateCoords(ACTUAL_COORDS);
+        drawPath(ctx, generatedCoords, "violet");
+        generatedCoords = generateCoords(generatedCoords);
+        drawPath(ctx, generatedCoords, "indigo");
+        generatedCoords = generateCoords(generatedCoords);
+        drawPath(ctx, generatedCoords, "blue");
+        generatedCoords = generateCoords(generatedCoords);
+        drawPath(ctx, generatedCoords, "green");
+        generatedCoords = generateCoords(generatedCoords);
+        drawPath(ctx, generatedCoords, "yellow");
+        generatedCoords = generateCoords(generatedCoords);
+        drawPath(ctx, generatedCoords, "orange");
+        generatedCoords = generateCoords(generatedCoords);
         drawPath(ctx, generatedCoords, "red");
+        drawPath(ctx, ACTUAL_COORDS, "white");
         
         RECORDING = false;
         ACTUAL_COORDS = [];
