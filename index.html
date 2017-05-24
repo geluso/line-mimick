@@ -14,6 +14,8 @@
       var GENERATED_COORDS = [];
       var RECORDING = false;
       
+      var MAP = {x: {}, y: {}};
+      
       var ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -30,12 +32,19 @@
       document.addEventListener("touchend", stopRecording);
       document.addEventListener("touchcancel", stopRecording);
 
+      var INSTANT_X;
+      var INSTANT_Y;
       function startRecording(ev) {
         RECORDING = true;
         if (ev.touches !== undefined) {
           ev = ev.touches[0];
         }
-        ACTUAL_COORDS.push({x: Math.round(ev.pageX), y: Math.round(ev.pageY)});
+        
+        var x = Math.round(ev.pageX);
+        var y = Math.round(ev.pageY);
+        ACTUAL_COORDS.push({x: x, y: y});
+        INSTANT_X = x;
+        INSTANT_Y = y;
       }
       
       function stillRecording(ev) {
@@ -44,11 +53,39 @@
         }
         if(RECORDING) {
           ACTUAL_COORDS.push({x: Math.round(ev.pageX), y: Math.round(ev.pageY)});
-          if (ACTUAL_COORDS.length > 1) {
-            drawPath(ctx, [ACTUAL_COORDS[ACTUAL_COORDS.length - 2], ACTUAL_COORDS[ACTUAL_COORDS.length - 1]], "white");
+          if (ACTUAL_COORDS.length > 2) {
+            // build up markov chain instantly
+            var p0 = ACTUAL_COORDS[ACTUAL_COORDS.length - 3];
+            var p1 = ACTUAL_COORDS[ACTUAL_COORDS.length - 2];
+            var p2 = ACTUAL_COORDS[ACTUAL_COORDS.length - 1];
+            
+            addPointsToChain(MAP, p0, p1, p2);
+            
+            drawPath(ctx, [p1, p2], "white");
+            var segment = generateSegment([p1, p2]);
+            if (segment) {
+              drawPath(ctx, segment, "red");
+              INSTANT_X = segment[1].x;
+              INSTANT_Y = segment[1].y;
+            }
           }
         }
       };
+      
+      function generateSegment(lastSegment) {
+        var dx = lastSegment[1].x - lastSegment[0].x;
+        var dy = lastSegment[1].y - lastSegment[0].y;
+        
+        if (MAP[dx] === undefined || MAP[dx][dy] === undefined) {
+          return;
+        }
+        values = MAP[dx][dy];
+        val = values[Math.floor(Math.random() * values.length)];
+        
+        var p0 = {x: INSTANT_X, y: INSTANT_Y};
+        var p1 = {x: INSTANT_X + val.x, y: INSTANT_Y + val.y};
+        return [p0, p1];
+      }
       
       function key(value, bucketSize) {
         bucketSize = bucketSize || BUCKET_SIZE || 1;
@@ -110,22 +147,31 @@
           var p1 = ACTUAL_COORDS[i - 1];
           var p2 = ACTUAL_COORDS[i];
           
-          var dx1 = p1.x - p0.x;
-          var dx2 = p2.x - p1.x;
-          
-          var dy1 = p1.y - p0.y;
-          var dy2 = p2.y - p1.y;
-          
-          if (map[dx1] === undefined) {
-            map[dx1] = {};
-          }
-          if (map[dx1][dy1] === undefined) {
-            map[dx1][dy1] = [];
-          }
-          
-          map[dx1][dy1].push({x: dx2, y: dy2});
+          addPointsToChain(map, p0, p1, p2);
         }
         return map;
+      }
+      
+      function addPointsToChain(map, p0, p1, p2) {
+        var dx1 = p1.x - p0.x;
+        var dx2 = p2.x - p1.x;
+        
+        var dy1 = p1.y - p0.y;
+        var dy2 = p2.y - p1.y;
+        
+        if (map[dx1] === undefined) {
+          map[dx1] = {};
+        }
+        if (map[dx1][dy1] === undefined) {
+          map[dx1][dy1] = [];
+        }
+        
+        map[dx1][dy1].push({x: dx2, y: dy2});
+      }
+      
+      
+      function getInstantMap() {
+        return MAP;
       }
       
       function generateCoords(path) {
@@ -181,7 +227,10 @@
         }
         var mode = "derivitive rainbow";
         mode = "repeat rainbow";
-        if (mode === "derivitive rainbow") {
+        //mode = "instant";
+        if (mode === "instant") {
+          
+        } else if (mode === "derivitive rainbow") {
           var generatedCoords = generateCoords(ACTUAL_COORDS);
           drawPath(ctx, generatedCoords, "violet");
           generatedCoords = generateCoords(generatedCoords);
