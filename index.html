@@ -2,8 +2,10 @@
   <head>
     <title></title>
     <link rel="icon" href="http://5tephen.com/img/cheeseplane.gif" type="image/gif"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   </head>
-  <body style="background-color: black;">
+  <body style="background-color: black; margin: 0; padding: 0;">
+    <button id="clear" style="font-size: 300%; color: white; position: fixed; bottom: 0; right: 0;"> clear</button>
     <canvas id="canvas" style="width: 100%; height: 100%;"></canvas>
     <script>
       var BUCKET_SIZE = 1;
@@ -18,12 +20,28 @@
       ctx.width = window.innerWidth;
       ctx.height = window.innerHeight;
       
-      document.onmousedown = function(ev) {
+      document.addEventListener("mousedown", startRecording);
+      document.addEventListener("mousemove", stillRecording);
+      document.addEventListener("mouseup", stopRecording);
+      document.addEventListener("mouseout", stopRecording);
+
+      document.addEventListener("touchstart", startRecording);
+      document.addEventListener("touchmove", stillRecording);
+      document.addEventListener("touchend", stopRecording);
+      document.addEventListener("touchcancel", stopRecording);
+
+      function startRecording(ev) {
         RECORDING = true;
+        if (ev.touches !== undefined) {
+          ev = ev.touches[0];
+        }
         ACTUAL_COORDS.push({x: ev.pageX, y: ev.pageY});
       }
       
-      document.onmousemove = function(ev) {
+      function stillRecording(ev) {
+        if (ev.touches !== undefined) {
+          ev = ev.touches[0];
+        }
         if(RECORDING) {
           ACTUAL_COORDS.push({x: ev.pageX, y: ev.pageY});
         }
@@ -35,8 +53,11 @@
       }
       
       function drawPath(ctx, path, color="black") {
+        if (!path || path.length < 2) {
+          return;
+        }
         ctx.strokeStyle = color;
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 12;
         ctx.beginPath();
         ctx.moveTo(path[0].x, path[0].y);
         
@@ -105,6 +126,10 @@
       }
       
       function generateCoords(path) {
+        if (path.length < 2) {
+          return;
+        }
+
         // var getMap = generateMap;
         var getMap = generateXYDependentMap;
         var map = getMap();
@@ -147,26 +172,75 @@
         return coords;
       }
       
-      document.onmouseup = function() {
-        var generatedCoords = generateCoords(ACTUAL_COORDS);
-        drawPath(ctx, generatedCoords, "violet");
-        generatedCoords = generateCoords(generatedCoords);
-        drawPath(ctx, generatedCoords, "indigo");
-        generatedCoords = generateCoords(generatedCoords);
-        drawPath(ctx, generatedCoords, "blue");
-        generatedCoords = generateCoords(generatedCoords);
-        drawPath(ctx, generatedCoords, "green");
-        generatedCoords = generateCoords(generatedCoords);
-        drawPath(ctx, generatedCoords, "yellow");
-        generatedCoords = generateCoords(generatedCoords);
-        drawPath(ctx, generatedCoords, "orange");
-        generatedCoords = generateCoords(generatedCoords);
-        drawPath(ctx, generatedCoords, "red");
-        drawPath(ctx, ACTUAL_COORDS, "white");
+      function stopRecording() {
+        if (!RECORDING) {
+          return;
+        }
+        var mode = "derivitive rainbow";
+        mode = "repeat rainbow";
+        if (mode === "derivitive rainbow") {
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "violet");
+          generatedCoords = generateCoords(generatedCoords);
+          drawPath(ctx, generatedCoords, "indigo");
+          generatedCoords = generateCoords(generatedCoords);
+          drawPath(ctx, generatedCoords, "blue");
+          generatedCoords = generateCoords(generatedCoords);
+          drawPath(ctx, generatedCoords, "green");
+          generatedCoords = generateCoords(generatedCoords);
+          drawPath(ctx, generatedCoords, "yellow");
+          generatedCoords = generateCoords(generatedCoords);
+          drawPath(ctx, generatedCoords, "orange");
+          generatedCoords = generateCoords(generatedCoords);
+          drawPath(ctx, generatedCoords, "red");
+          drawPath(ctx, ACTUAL_COORDS, "white");
+        } else if (mode === "repeat rainbow") {
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "violet");
+          generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "indigo");
+          generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "blue");
+          generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "green");
+          generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "orange");
+          generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "red");
+          drawPath(ctx, ACTUAL_COORDS, "white");
+        } else {
+          drawPath(ctx, ACTUAL_COORDS, "white");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+          var generatedCoords = generateCoords(ACTUAL_COORDS);
+          drawPath(ctx, generatedCoords, "yellow");
+        }
         
         RECORDING = false;
         ACTUAL_COORDS = [];
         GENERATED_COORDS = [];
+      }
+
+      document.getElementById("clear").addEventListener("click", clearCanvas);
+
+      function clearCanvas() {
+        ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.width = window.innerWidth;
+        ctx.height = window.innerHeight;
       }
     
     </script>
