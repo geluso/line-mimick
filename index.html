@@ -35,7 +35,7 @@
         if (ev.touches !== undefined) {
           ev = ev.touches[0];
         }
-        ACTUAL_COORDS.push({x: ev.pageX, y: ev.pageY});
+        ACTUAL_COORDS.push({x: Math.round(ev.pageX), y: Math.round(ev.pageY)});
       }
       
       function stillRecording(ev) {
@@ -43,7 +43,7 @@
           ev = ev.touches[0];
         }
         if(RECORDING) {
-          ACTUAL_COORDS.push({x: ev.pageX, y: ev.pageY});
+          ACTUAL_COORDS.push({x: Math.round(ev.pageX), y: Math.round(ev.pageY)});
         }
       };
       
