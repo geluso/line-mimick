@@ -1,4 +1,5 @@
 var BUCKET_SIZE = 1;
+var REPEATS = 7;
 
 var ACTUAL_COORDS = [];
 var GENERATED_COORDS = [];
@@ -179,55 +180,27 @@ function stopRecording() {
   if (!RECORDING) {
     return;
   }
+  var colors = ["violet", "indigo", "blue", "green", "yellow", "orange", "red"];
   if (MODE === "derivitive rainbow") {
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "violet");
-    generatedCoords = generateCoords(generatedCoords);
-    drawPath(CTX, generatedCoords, "indigo");
-    generatedCoords = generateCoords(generatedCoords);
-    drawPath(CTX, generatedCoords, "blue");
-    generatedCoords = generateCoords(generatedCoords);
-    drawPath(CTX, generatedCoords, "green");
-    generatedCoords = generateCoords(generatedCoords);
-    drawPath(CTX, generatedCoords, "yellow");
-    generatedCoords = generateCoords(generatedCoords);
-    drawPath(CTX, generatedCoords, "orange");
-    generatedCoords = generateCoords(generatedCoords);
-    drawPath(CTX, generatedCoords, "red");
-    drawPath(CTX, ACTUAL_COORDS, "white");
+    drawPath(CTX, generatedCoords, colors[0]);
+    for (var i = 1; i < REPEATS; i++) {
+      generatedCoords = generateCoords(generatedCoords);
+      drawPath(CTX, generatedCoords, colors[i % colors.length]);
+    }
   } else if (MODE === "repeat rainbow") {
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "violet");
-    generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "indigo");
-    generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "blue");
-    generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "green");
-    generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "orange");
-    generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "red");
-    drawPath(CTX, ACTUAL_COORDS, "white");
+    for (var i = 0; i < REPEATS; i++) {
+      var generatedCoords = generateCoords(ACTUAL_COORDS);
+      drawPath(CTX, generatedCoords, colors[i % colors.length]);
+    }
   } else {
-    drawPath(CTX, ACTUAL_COORDS, "white");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
-    var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(CTX, generatedCoords, "yellow");
+    for (var i = 0; i < REPEATS; i++) {
+      var generatedCoords = generateCoords(ACTUAL_COORDS);
+      drawPath(CTX, generatedCoords, "yellow");
+    }
   }
+    
+  drawPath(CTX, ACTUAL_COORDS, "white");
   
   RECORDING = false;
   ACTUAL_COORDS = [];
@@ -254,6 +227,12 @@ function toggleAbout() {
   } else {
     aboutText.style.visibility = "hidden";
   }
+}
+
+document.getElementById("repeats").addEventListener("change", setRepeats);
+function setRepeats() {
+  REPEATS = parseInt(document.getElementById("repeats").value, 10);
+  REPEATS = Math.max(REPEATS, 1);
 }
 
 document.getElementById("clear").addEventListener("click", clearCanvas);
