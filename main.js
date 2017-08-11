@@ -109,6 +109,9 @@ function generateXYDependentMap() {
     var dy1 = p1.y - p0.y;
     var dy2 = p2.y - p1.y;
     
+    dx1 = Math.floor(dx1 / BUCKET_SIZE);
+    dy1 = Math.floor(dy1 / BUCKET_SIZE);
+    
     if (map[dx1] === undefined) {
       map[dx1] = {};
     }
@@ -155,6 +158,8 @@ function generateCoords(path) {
         dy = y_val;
       }
     } else {
+      dx = Math.floor(dx / BUCKET_SIZE);
+      dy = Math.floor(dy / BUCKET_SIZE);
       if (map[dx] === undefined || map[dx][dy] === undefined) {
         break;
       }
@@ -230,9 +235,13 @@ function stopRecording() {
 }
 
 document.getElementById("mode").addEventListener("change", selectMode);
-
 function selectMode() {
   MODE = document.getElementById("mode").value;
+}
+
+document.getElementById("conesize").addEventListener("change", selectConeSize);
+function selectConeSize() {
+  BUCKET_SIZE = parseInt(document.getElementById("conesize").value, 10);
 }
 
 document.getElementById("clear").addEventListener("click", clearCanvas);
