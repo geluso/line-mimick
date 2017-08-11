@@ -3,12 +3,13 @@ var BUCKET_SIZE = 1;
 var ACTUAL_COORDS = [];
 var GENERATED_COORDS = [];
 var RECORDING = false;
+var MODE = "repeat rainbow";
 
-var ctx = canvas.getContext("2d");
+var CTX = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-ctx.width = window.innerWidth;
-ctx.height = window.innerHeight;
+CTX.width = window.innerWidth;
+CTX.height = window.innerHeight;
 
 document.addEventListener("mousedown", startRecording);
 document.addEventListener("mousemove", stillRecording);
@@ -35,7 +36,9 @@ function stillRecording(ev) {
   if(RECORDING) {
     ACTUAL_COORDS.push({x: Math.round(ev.pageX), y: Math.round(ev.pageY)});
     if (ACTUAL_COORDS.length > 1) {
-      drawPath(ctx, [ACTUAL_COORDS[ACTUAL_COORDS.length - 2], ACTUAL_COORDS[ACTUAL_COORDS.length - 1]], "white");
+      var p1 = ACTUAL_COORDS[ACTUAL_COORDS.length - 2];
+      var p2 = ACTUAL_COORDS[ACTUAL_COORDS.length - 1];
+      drawPath(CTX, [p1, p2], "white");
     }
   }
 };
@@ -45,21 +48,21 @@ function key(value, bucketSize) {
   return Math.floor(value / bucketSize) * bucketSize;
 }
 
-function drawPath(ctx, path, color="black") {
+function drawPath(CTX, path, color="black") {
   if (!path || path.length < 2) {
     return;
   }
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 12;
-  ctx.beginPath();
-  ctx.moveTo(path[0].x, path[0].y);
+  CTX.strokeStyle = color;
+  CTX.lineWidth = 12;
+  CTX.beginPath();
+  CTX.moveTo(path[0].x, path[0].y);
   
   for (var i = 0; i < path.length - 1; i++) {
     var p0 = path[i];
     var p1 = path[i + 1];
-    ctx.lineTo(p1.x, p1.y);
+    CTX.lineTo(p1.x, p1.y);
   };
-  ctx.stroke();
+  CTX.stroke();
 }
 
 function generateMap() {
@@ -142,8 +145,10 @@ function generateCoords(path) {
       if (x_values === undefined || y_values === undefined) {
         break;
       } else {
-        var x_val = x_values[Math.floor(Math.random() * x_values.length)];
-        var y_val = y_values[Math.floor(Math.random() * y_values.length)];
+        var xi = Math.floor(Math.random() * x_values.length);
+        var yi = Math.floor(Math.random() * y_values.length);
+        var x_val = x_values[xi];
+        var y_val = y_values[yi];
         xx += x_val;
         yy += y_val;
         dx = x_val;
@@ -169,56 +174,54 @@ function stopRecording() {
   if (!RECORDING) {
     return;
   }
-  var mode = "derivitive rainbow";
-  mode = "repeat rainbow";
-  if (mode === "derivitive rainbow") {
+  if (MODE === "derivitive rainbow") {
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "violet");
+    drawPath(CTX, generatedCoords, "violet");
     generatedCoords = generateCoords(generatedCoords);
-    drawPath(ctx, generatedCoords, "indigo");
+    drawPath(CTX, generatedCoords, "indigo");
     generatedCoords = generateCoords(generatedCoords);
-    drawPath(ctx, generatedCoords, "blue");
+    drawPath(CTX, generatedCoords, "blue");
     generatedCoords = generateCoords(generatedCoords);
-    drawPath(ctx, generatedCoords, "green");
+    drawPath(CTX, generatedCoords, "green");
     generatedCoords = generateCoords(generatedCoords);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     generatedCoords = generateCoords(generatedCoords);
-    drawPath(ctx, generatedCoords, "orange");
+    drawPath(CTX, generatedCoords, "orange");
     generatedCoords = generateCoords(generatedCoords);
-    drawPath(ctx, generatedCoords, "red");
-    drawPath(ctx, ACTUAL_COORDS, "white");
-  } else if (mode === "repeat rainbow") {
+    drawPath(CTX, generatedCoords, "red");
+    drawPath(CTX, ACTUAL_COORDS, "white");
+  } else if (MODE === "repeat rainbow") {
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "violet");
+    drawPath(CTX, generatedCoords, "violet");
     generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "indigo");
+    drawPath(CTX, generatedCoords, "indigo");
     generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "blue");
+    drawPath(CTX, generatedCoords, "blue");
     generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "green");
+    drawPath(CTX, generatedCoords, "green");
     generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "orange");
+    drawPath(CTX, generatedCoords, "orange");
     generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "red");
-    drawPath(ctx, ACTUAL_COORDS, "white");
+    drawPath(CTX, generatedCoords, "red");
+    drawPath(CTX, ACTUAL_COORDS, "white");
   } else {
-    drawPath(ctx, ACTUAL_COORDS, "white");
+    drawPath(CTX, ACTUAL_COORDS, "white");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
     var generatedCoords = generateCoords(ACTUAL_COORDS);
-    drawPath(ctx, generatedCoords, "yellow");
+    drawPath(CTX, generatedCoords, "yellow");
   }
   
   RECORDING = false;
@@ -226,12 +229,18 @@ function stopRecording() {
   GENERATED_COORDS = [];
 }
 
+document.getElementById("mode").addEventListener("change", selectMode);
+
+function selectMode() {
+  MODE = document.getElementById("mode").value;
+}
+
 document.getElementById("clear").addEventListener("click", clearCanvas);
 
 function clearCanvas() {
-  ctx = canvas.getContext("2d");
+  CTX = canvas.getContext("2d");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  ctx.width = window.innerWidth;
-  ctx.height = window.innerHeight;
+  CTX.width = window.innerWidth;
+  CTX.height = window.innerHeight;
 }
