@@ -244,6 +244,18 @@ function selectConeSize() {
   BUCKET_SIZE = parseInt(document.getElementById("conesize").value, 10);
 }
 
+document.getElementById("about").addEventListener("click", toggleAbout);
+document.getElementById("close").addEventListener("click", toggleAbout);
+function toggleAbout() {
+  var aboutText = document.getElementById("abouttext");
+  var visibility = getComputedStyle(aboutText).visibility;
+  if (visibility === "hidden") {
+    aboutText.style.visibility = "visible";
+  } else {
+    aboutText.style.visibility = "hidden";
+  }
+}
+
 document.getElementById("clear").addEventListener("click", clearCanvas);
 
 function clearCanvas() {
